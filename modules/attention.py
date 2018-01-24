@@ -4,8 +4,9 @@ from torch.nn import functional as F
 
 
 class AttentionPooling(nn.Module):
-    def __init__(self, key_size, *query_sizes, attn_size=75, batch_first=False):
+    def __init__(self, key_size, query_sizes, attn_size=75, batch_first=False):
         super().__init__()
+        # TODO: attn_size = 75 by default
         self.key_linear = nn.Linear(key_size, attn_size, bias=False)
         self.query_linears = nn.ModuleList([nn.Linear(query_size, attn_size, bias=False) for query_size in query_sizes])
         self.score_linear = nn.Linear(attn_size, 1, bias=False)

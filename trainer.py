@@ -33,8 +33,7 @@ class Trainer(object):
             dataset_json = json.load(dataset_file)
             if dataset_json['version'] != expected_version:
                 print('Evaluation expects v-' + expected_version +
-                      ', but got dataset with v-' + dataset_json['version'],
-                      file=sys.stderr)
+                      ', but got dataset with v-' + dataset_json['version'])
             self.dev_dataset = dataset_json['data']
 
         self.dataloader_train = dataloader_train
@@ -78,7 +77,7 @@ class Trainer(object):
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
 
-        configure("log/%s" % (self.name), flush_secs=5)
+        configure("log/%s" % (self.name))
         self.checkpoint_path = os.path.join(args.checkpoint_path, self.name)
         make_dirs(self.checkpoint_path)
 
@@ -98,12 +97,12 @@ class Trainer(object):
                 if self.step % 10 == 0:
                     used_time = time.time() - last_time
                     step_num = self.step - last_step
-                    print("step %d / %d of epoch %d)" % (batch_idx, len(self.dataloader_train), epoch), flush=True)
-                    print("loss: ", global_loss / step_num, flush=True)
-                    print("acc: ", global_acc / step_num, flush=True)
+                    print("step %d / %d of epoch %d)" % (batch_idx, len(self.dataloader_train), epoch))
+                    print("loss: ", global_loss / step_num)
+                    print("acc: ", global_acc / step_num)
                     speed = self.dataloader_train.batch_size * step_num / used_time
                     print("speed: %f examples/sec \n\n" %
-                          (speed), flush=True)
+                          (speed))
 
                     log_value('train/EM', global_acc / step_num, self.step)
                     log_value('train/loss', global_loss / step_num, self.step)
@@ -116,8 +115,8 @@ class Trainer(object):
                 self.step += 1
 
             exact_match, f1 = self.eval()
-            print("exact_match: %f)" % exact_match, flush=True)
-            print("f1: %f)" % f1, flush=True)
+            print("exact_match: %f)" % exact_match)
+            print("f1: %f)" % f1)
 
             log_value('dev/f1', f1, self.step)
             log_value('dev/EM', exact_match, self.step)

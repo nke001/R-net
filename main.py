@@ -55,7 +55,9 @@ def main():
         "embedding_type": "glove.840B",
         "embedding_dim": 300
     }
-    print("Reading Vocab", flush=True)
+    import ipdb; ipdb.set_trace()
+    print ('Reading vocab')
+    #print("Reading Vocab", flush=True)
     char_vocab_config = word_vocab_config.copy()
     char_vocab_config["embedding_root"] = os.path.join(args.app_path, "data", "embedding", "char")
     char_vocab_config["embedding_type"] = "glove_char.840B"
@@ -103,8 +105,8 @@ def main():
                       "dropout": args.dropout,
                       "residual": args.residual,
                       "rnn_cell": torch.nn.GRUCell}
-
-    print("DEBUG Mode is ", "On" if args.debug else "Off", flush=True)
+    print("DEBUG Mode is ", "On" if args.debug else "Off")
+    #print("DEBUG Mode is ", "On" if args.debug else "Off", flush=True)
     train_cache = "./data/cache/SQuAD%s.pkl" % ("_debug" if args.debug else "")
     dev_cache = "./data/cache/SQuAD_dev%s.pkl" % ("_debug" if args.debug else "")
 
@@ -126,12 +128,12 @@ def main():
 
 def read_dataset(json_file, itos, stoi, itoc, ctoi, cache_file, is_debug=False, split="train"):
     if os.path.isfile(cache_file):
-        print("Read built %s dataset from %s" % (split, cache_file), flush=True)
+        print("Read built %s dataset from %s" % (split, cache_file))
         dataset = pickle.load(open(cache_file, "rb"))
-        print("Finished reading %s dataset from %s" % (split, cache_file), flush=True)
+        print("Finished reading %s dataset from %s" % (split, cache_file))
 
     else:
-        print("building %s dataset" % split, flush=True)
+        print("building %s dataset" % split)
         from utils.dataset import SQuAD
         dataset = SQuAD(json_file, itos, stoi, itoc, ctoi, debug_mode=is_debug, split=split)
         pickle.dump(dataset, open(cache_file, "wb"))

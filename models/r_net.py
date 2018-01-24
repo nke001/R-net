@@ -18,7 +18,7 @@ def pack_residual(x_pack, y_pack):
 class PairEncoder(nn.Module):
     def __init__(self, question_embed_size, passage_embed_size, config,
                  cell_factory=AttentionEncoderCell):
-        super().__init__()
+        super(PairEncoder, self).__init__()
 
         attn_args = [question_embed_size, passage_embed_size, config["hidden_size"]]
         attn_kwags = {"attn_size": 75, "batch_first": False}
@@ -41,7 +41,7 @@ class PairEncoder(nn.Module):
 class SelfMatchingEncoder(nn.Module):
     def __init__(self, passage_embed_size, config,
                  cell_factory=AttentionEncoderCell):
-        super().__init__()
+        super(SelfMatchingEncoder, self).__init__()
         attn_args = [passage_embed_size, passage_embed_size]
         attn_kwags = {"attn_size": 75, "batch_first": False}
 
@@ -65,7 +65,7 @@ class WordEmbedding(nn.Module):
     """
 
     def __init__(self, char_embedding_config, word_embedding_config):
-        super().__init__()
+        super(WordEmbedding, self).__init__()
 
         word_embedding = word_embedding_config["embedding_weights"]
         word_vocab_size, word_embedding_dim = word_embedding.size()
@@ -94,7 +94,7 @@ class WordEmbedding(nn.Module):
 
 class SentenceEncoding(nn.Module):
     def __init__(self, input_size, config):
-        super().__init__()
+        super(SentenceEncoding, self).__init__()
 
         self.question_encoder = RNN(input_size, config["hidden_size"],
                                     num_layers=config["num_layers"],
@@ -116,7 +116,7 @@ class SentenceEncoding(nn.Module):
 class PointerNetwork(nn.Module):
     def __init__(self, question_size, passage_size, hidden_size, attn_size=None,
                  cell_type=nn.GRUCell, num_layers=1, dropout=0, residual=False, **kwargs):
-        super().__init__()
+        super(PointerNetwork, self).__init__()
         self.num_layers = num_layers
         if attn_size is None:
             attn_size = question_size
@@ -150,7 +150,7 @@ class PointerNetwork(nn.Module):
 class Model(nn.Module):
     def __init__(self, args, char_embedding_config, word_embedding_config, sentence_encoding_config,
                  pair_encoding_config, self_matching_config, pointer_config):
-        super().__init__()
+        super(Model, self).__init__()
         self.embedding = WordEmbedding(char_embedding_config, word_embedding_config)
 
         self.r_net = RNet(args, self.embedding.embedding_size, char_embedding_config, word_embedding_config,
@@ -159,7 +159,7 @@ class Model(nn.Module):
 
         self.device_id = args.device_id
 
-    def forward(self, question: Documents, passage: Documents):
+    def forward(self, question, passage):
         embedded_question, embedded_passage = self.embedding(question.tensor, passage.tensor)
 
         if torch.cuda.is_available():
@@ -178,7 +178,7 @@ class Model(nn.Module):
 class RNet(nn.Module):
     def __init__(self, args, embedding_size, char_embedding_config, word_embedding_config, sentence_encoding_config,
                  pair_encoding_config, self_matching_config, pointer_config):
-        super().__init__()
+        super(RNet,self).__init__()
         self.current_score = 0
         self.sentence_encoding = SentenceEncoding(embedding_size, sentence_encoding_config)
 
@@ -202,7 +202,7 @@ class RNet(nn.Module):
                 nn.init.orthogonal(weight)
 
 
-    def forward(self, question: Documents, passage: Documents, embedded_question, embedded_passage):
+    def forward(self, question, passage, embedded_question, embedded_passage):
         # embed words using char-level and word-level and concat them
         passage_pack, question_pack = self._sentence_encoding(embedded_passage, embedded_question,
                                                               passage, question)

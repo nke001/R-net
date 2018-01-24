@@ -12,7 +12,7 @@ class RNN(nn.Module):
                  output_projection_size=None, num_layers=1,
                  bidirectional=True, cell_type="lstm", dropout=0,
                  pack=False, batch_first=False, init_method="default"):
-        super().__init__()
+        super(RNN, self).__init__()
         self.input_layer = nn.Linear(input_size, hidden_size)
 
         if output_projection_size is not None:
@@ -89,7 +89,7 @@ class AttentionEncoderCell(StackedCell):
                  dropout=0, bias=True, rnn_cell=nn.GRUCell, residual=False,
                  gated=True):
         input_size = question_embed_size + passage_embed_size
-        super().__init__(input_size, hidden_size, num_layers,
+        super(AttentionEncoderCell, self).__init__(input_size, hidden_size, num_layers,
                          dropout, bias, rnn_cell, residual)
         self.attention = attention_layer_factory(*attn_args, **attn_kwags)
         self.gated = gated
@@ -121,12 +121,12 @@ class AttentionEncoderCell(StackedCell):
         inputs = torch.cat([context, inputs], dim=context.dim()-1)
         if self.gated:
             inputs = inputs * self.gate(inputs)
-        return super().forward(inputs.squeeze(0), hidden)
+        return super(AttentionEncoderCell, self).forward(inputs.squeeze(0), hidden)
 
 
 class AttentionEncoder(nn.Module):
-    def __init__(self, cell_factory, *args, bidirectional=False, mode="GRU", **kwargs):
-        super().__init__()
+    def __init__(self, cell_factory, args, bidirectional=False, mode="GRU", **kwargs):
+        super(AttentionEncoder, self).__init__()
         self.bidirectional = bidirectional
         self.hidden_size = args[2]
         self.forward_cell = cell_factory(*args, **kwargs)
